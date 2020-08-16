@@ -129,8 +129,63 @@ table(iris_test_target, m1)
 # - - - - - - - - - - - - - 
 
 
+# can we predict country in gapminder based on data from previous decades? 
+
+#  - - - - - 
+
+data("gapminder")
+
+# randomize the row order of gapminder 
+ran <- runif(nrow(gapminder)) 
+ran
+
+gapminder <- gapminder[order(ran), ]
+gapminder
 
 
+gapminder <- gapminder %>%
+  select(-c(continent, year)) 
+
+
+# convert predictor variables to numerics 
+
+gap_filter <- lapply(gapminder[ , c(2:4)], as.numeric)
+str(gap_filter)
+
+
+normalize <- function(x) { 
+  return( (x-min(x)) / (max(x) - min(x) ) ) } 
+
+gap_norm <- as.data.frame(lapply(gap_filter, normalize)) 
+head(gap_norm)
+
+str(gapminder)
+str(gap_norm)
+1704 * 0.8
+1704 - 1363
+
+gap_train <- gap_norm[1:1363, ]
+gap_test <- gap_norm[1364:1704, ]
+
+
+head(gapminder)
+
+gap_train_category <- gapminder$country[1:1363]
+gap_test_category <- gapminder$country[1364:1704]
+class(gap_test_category)
+sqrt(1704)
+
+pred <- knn(train = gap_train, test = gap_test, cl = gap_train_category, k = 41) 
+tb <- table(gap_test_category, pred)
+accuracy <- function(x) {sum(diag(x)/ (sum(rowSums(x)))) * 100 }
+accuracy(tb)
+
+
+
+
+
+
+# 
 
 
 
